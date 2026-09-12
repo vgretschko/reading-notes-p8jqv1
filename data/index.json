@@ -1,4 +1,28 @@
 {
-  "generated": "2026-09-12T12:12:13Z",
-  "papers": []
+  "generated": "2026-09-12T15:09:34Z",
+  "papers": [
+    {
+      "id": "2026-09-12-bergemann-procurement-without-priors",
+      "title": "Procurement without Priors: A Simple Mechanism and its Notable Performance",
+      "authors": [
+        "Dirk Bergemann",
+        "Tibor Heumann",
+        "Stephen Morris"
+      ],
+      "year": 2026,
+      "venue": "Cowles Discussion Paper 2479 (revision)",
+      "date_added": "2026-09-12",
+      "tags": [
+        "procurement",
+        "mechanism design",
+        "robust mechanism design",
+        "regulation"
+      ],
+      "method": "theory",
+      "relevance": 5,
+      "link": "https://arxiv.org/abs/2512.09129",
+      "source_file": "demand based-revision-3aug26db.pdf",
+      "tldr": "A buyer with no prior over supplier costs can still guarantee a constant fraction of first-best surplus by paying a fixed share of their own gross utility — and no mechanism, however complex, does better in the worst case."
+    }
+  ]
 }
