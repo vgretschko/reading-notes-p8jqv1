@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Unlisted site: ask every crawler to stay away. -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141519" media="(prefers-color-scheme: dark)">
+<!-- Lets you add the digest to the iPhone home screen like an app. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Digest">
+<title>Reading Digest</title>
+<style>
+/* ---------------------------------------------------------------
+   Colour tokens. Light values live on :root, dark values are
+   redefined in the media query. Everything else uses the tokens,
+   so the whole site follows the phone's light/dark setting.
+   --------------------------------------------------------------- */
+:root{
+  --bg:#f7f7f5; --surface:#ffffff; --surface-2:#eeeef0;
+  --text:#191b20; --text-dim:#666b76; --line:#dcdde2;
+  --accent:#27497e; --accent-soft:#e3e9f3;
+  --star:#b8860b;
+  /* Relevance runs grey → slate → ink, so 5/5 reads as the darkest mark. */
+  --r1:#8d939d; --r3:#5b7396; --r5:#27497e;
+  --radius:12px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#141519; --surface:#1c1e24; --surface-2:#24262e;
+    --text:#E8E9EC; --text-dim:#949aa6; --line:#2e313a;
+    --accent:#8fb0e3; --accent-soft:#1f2a3d;
+    --star:#d6a93c;
+    --r1:#6b7078; --r3:#7e96b5; --r5:#8fb0e3;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  padding-bottom:calc(16px + var(--safe-b));
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px}
+
+/* ---------- header ---------- */
+header{
+  position:sticky; top:0; z-index:20; background:var(--bg);
+  border-bottom:1px solid var(--line);
+  padding-block:12px 10px;
+}
+.titlebar{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+h1{font-size:20px; margin:0; letter-spacing:-.01em; font-weight:650}
+.count{color:var(--text-dim); font-size:13px}
+.search{
+  width:100%; margin-top:10px; padding:10px 12px;
+  font-size:16px; /* 16px stops iOS zooming in on focus */
+  color:var(--text); background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--radius); outline:none;
+}
+.search:focus{border-color:var(--accent)}
+
+/* ---------- filter chips ---------- */
+.chiprow{display:flex; gap:6px; overflow-x:auto; padding-block:9px 2px; scrollbar-width:none}
+.chiprow::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto; padding:5px 11px; font-size:13px; cursor:pointer;
+  background:var(--surface); color:var(--text-dim);
+  border:1px solid var(--line); border-radius:999px; white-space:nowrap;
+}
+.chip[aria-pressed="true"]{background:var(--accent-soft); color:var(--accent); border-color:var(--accent)}
+.chiplabel{font-size:11px; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--text-dim); margin:10px 0 0}
+/* "Filters" toggle: the chip rows are long, so on a phone they stay folded
+   away until you ask for them, and the button reports how many are active. */
+.ftoggle{
+  margin-top:8px; padding:6px 12px; font-size:13px; cursor:pointer; font-weight:550;
+  background:var(--surface); color:var(--text-dim);
+  border:1px solid var(--line); border-radius:999px;
+}
+.ftoggle[aria-expanded="true"]{background:var(--accent-soft); color:var(--accent); border-color:var(--accent)}
+.ftoggle .n{font-weight:700}
+#filters[hidden]{display:none}
+/* While a paper is open, the search box and filters are just noise. */
+body.reading #q, body.reading .ftoggle, body.reading #filters, body.reading #count{display:none}
+body.reading header{border-bottom:0}
+
+/* ---------- paper cards ---------- */
+main{padding-top:14px}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:13px 14px; margin-bottom:9px; cursor:pointer; position:relative;
+}
+.card.read{opacity:.58}
+.card h2{font-size:16px; line-height:1.35; margin:0 22px 4px 0; font-weight:600}
+.meta{font-size:13px; color:var(--text-dim); margin:0 0 7px}
+.tldr{font-size:14px; margin:0; color:var(--text)}
+.card.read .tldr{display:none}
+.badges{display:flex; gap:5px; flex-wrap:wrap; margin-top:9px; align-items:center}
+.badge{font-size:11px; padding:2px 8px; border-radius:999px;
+  background:var(--surface-2); color:var(--text-dim); border:1px solid var(--line)}
+.badge.method{background:var(--accent-soft); color:var(--accent); border-color:transparent}
+.rel{font-size:11px; font-weight:650; padding:2px 8px; border-radius:999px;
+  color:var(--bg); font-variant-numeric:tabular-nums}
+.star{
+  position:absolute; top:9px; right:8px; width:34px; height:34px; line-height:34px;
+  text-align:center; font-size:17px; cursor:pointer; border:0; background:none;
+  color:var(--line); padding:0;
+}
+.star.on{color:var(--star)}
+.unreaddot{display:inline-block; width:7px; height:7px; border-radius:50%;
+  background:var(--accent); margin-right:6px; vertical-align:middle}
+.card.read .unreaddot{background:transparent}
+.empty{text-align:center; color:var(--text-dim); padding:48px 16px; font-size:14px}
+
+/* ---------- detail view ---------- */
+#detail{display:none; padding-block:8px 40px}
+#detail.show{display:block}
+.back{background:none; border:0; color:var(--accent); font-size:15px;
+  padding:8px 0; cursor:pointer; font-weight:550}
+#detail h2{font-size:21px; line-height:1.3; margin:6px 0 6px}
+.dmeta{color:var(--text-dim); font-size:14px; margin:0 0 12px}
+.actions{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 18px}
+.btn{
+  padding:9px 14px; font-size:14px; border-radius:var(--radius); cursor:pointer;
+  border:1px solid var(--line); background:var(--surface); color:var(--text);
+  text-decoration:none; display:inline-block; font-weight:550;
+}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.body{font-size:16px}
+/* Section headings are full questions ("Why was this hard and not done
+   before?"), so uppercase would shout across two wrapped lines. Colour and
+   weight carry the hierarchy instead. */
+.body h3{font-size:15.5px; color:var(--accent); margin:24px 0 6px;
+  font-weight:650; text-wrap:balance}
+.body h4{font-size:16px; margin:16px 0 5px; font-weight:650}
+.body p{margin:0 0 11px}
+.body strong{font-weight:650}
+.body em{color:var(--text)}
+.body ul,.body ol{margin:0 0 11px; padding-left:22px}
+.body li{margin-bottom:5px}
+.body blockquote{margin:0 0 11px; padding-left:12px; border-left:3px solid var(--line);
+  color:var(--text-dim)}
+.body code{background:var(--surface-2); padding:1px 5px; border-radius:5px; font-size:.9em}
+.srcfile{font-size:13px; color:var(--text-dim); margin-top:26px;
+  padding-top:12px; border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="titlebar">
+      <h1>Reading Digest</h1>
+      <span class="count" id="count"></span>
+    </div>
+    <input class="search" id="q" type="search" placeholder="Search title, author, venue, summary…"
+           autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="ftoggle" id="ftoggle" aria-expanded="false" aria-controls="filters">Filters</button>
+    <div id="filters" hidden></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <main id="list"></main>
+  <section id="detail"></section>
+</div>
+
+<script>
+/* ==================================================================
+   Reading Digest — client-side viewer.
+   Reads data/index.json (metadata + one-line gist for every paper)
+   and loads summaries/<id>.html only when you open a paper, so the
+   first load stays fast on a phone even with hundreds of entries.
+   ================================================================== */
+
+/* ---------- per-device state: what you've read and starred ----------
+   Stored in this browser only. Wrapped in try/catch because Safari
+   private mode throws instead of returning null.                     */
+const store = {
+  get(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    catch(e){ return fallback; }
+  },
+  set(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  }
+};
+let readSet    = new Set(store.get('digest.read', []));
+let starredSet = new Set(store.get('digest.starred', []));
+const persist = () => {
+  store.set('digest.read', [...readSet]);
+  store.set('digest.starred', [...starredSet]);
+};
+
+/* ---------- current filter state ---------- */
+let papers = [];
+const state = { q:'', tags:new Set(), methods:new Set(), minRel:0, only:null, sort:'date' };
+
+/* ---------- helpers ---------- */
+const el   = (id) => document.getElementById(id);
+const esc  = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const relColor = (r) => r >= 5 ? 'var(--r5)' : r >= 3 ? 'var(--r3)' : 'var(--r1)';
+const authorLine = (p) => {
+  const a = p.authors || [];
+  if(!a.length) return '';
+  return a.length > 3 ? a[0] + ' et al.' : a.join(', ');
+};
+
+/* ---------- build the filter chip rows from the data ---------- */
+function buildFilters(){
+  const tagCounts = {};
+  papers.forEach(p => (p.tags||[]).forEach(t => tagCounts[t] = (tagCounts[t]||0)+1));
+  // Most-used topics first, capped so the row stays usable on a phone.
+  const tags = Object.keys(tagCounts).sort((a,b)=>tagCounts[b]-tagCounts[a]).slice(0,24);
+  const methods = [...new Set(papers.map(p=>p.method).filter(Boolean))].sort();
+
+  const row = (label, html) =>
+    `<p class="chiplabel">${label}</p><div class="chiprow">${html}</div>`;
+
+  let html = '';
+  html += row('Show', [
+      ['all','Everything'], ['unread','Unread'], ['starred','Starred'], ['read','Read']
+    ].map(([v,t]) =>
+      `<button class="chip" data-kind="only" data-v="${v}" aria-pressed="${
+        (state.only||'all')===v}">${t}</button>`).join(''));
+
+  if(methods.length) html += row('Method', methods.map(m =>
+      `<button class="chip" data-kind="method" data-v="${esc(m)}" aria-pressed="false">${esc(m)}</button>`
+    ).join(''));
+
+  html += row('Relevance', [[0,'Any'],[3,'3+'],[4,'4+'],[5,'5 only']].map(([v,t]) =>
+      `<button class="chip" data-kind="rel" data-v="${v}" aria-pressed="${state.minRel===v}">${t}</button>`
+    ).join(''));
+
+  if(tags.length) html += row('Topic', tags.map(t =>
+      `<button class="chip" data-kind="tag" data-v="${esc(t)}" aria-pressed="false">${esc(t)} <span style="opacity:.6">${tagCounts[t]}</span></button>`
+    ).join(''));
+
+  html += row('Sort', [['date','Newest first'],['rel','Most relevant'],['year','Paper year'],['title','Title A–Z']]
+    .map(([v,t]) =>
+      `<button class="chip" data-kind="sort" data-v="${v}" aria-pressed="${state.sort===v}">${t}</button>`
+    ).join(''));
+
+  el('filters').innerHTML = html;
+}
+
+/* One click handler for every chip, using event delegation. */
+el('filters').addEventListener('click', (ev) => {
+  const chip = ev.target.closest('.chip');
+  if(!chip) return;
+  const {kind, v} = chip.dataset;
+
+  if(kind === 'tag' || kind === 'method'){
+    // Topics and methods toggle independently and combine (OR within a row).
+    const set = kind === 'tag' ? state.tags : state.methods;
+    set.has(v) ? set.delete(v) : set.add(v);
+    chip.setAttribute('aria-pressed', set.has(v));
+  }else{
+    // Show / Relevance / Sort are single-choice rows.
+    if(kind === 'only') state.only = (v === 'all') ? null : v;
+    if(kind === 'rel')  state.minRel = +v;
+    if(kind === 'sort') state.sort = v;
+    chip.parentElement.querySelectorAll('.chip')
+        .forEach(c => c.setAttribute('aria-pressed', c === chip));
+  }
+  render();
+});
+
+/* ---------- the Filters fold ---------- */
+function activeFilterCount(){
+  return state.tags.size + state.methods.size
+       + (state.only ? 1 : 0) + (state.minRel ? 1 : 0);
+}
+function syncToggle(){
+  const n = activeFilterCount();
+  el('ftoggle').innerHTML = n ? `Filters <span class="n">${n}</span>` : 'Filters';
+}
+el('ftoggle').addEventListener('click', () => {
+  const open = el('filters').hidden;           // currently folded away?
+  el('filters').hidden = !open;
+  el('ftoggle').setAttribute('aria-expanded', open);
+});
+
+el('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase().trim(); render(); });
+
+/* ---------- filtering and sorting ---------- */
+function visible(){
+  let out = papers.filter(p => {
+    if(state.only === 'unread'  && readSet.has(p.id)) return false;
+    if(state.only === 'read'    && !readSet.has(p.id)) return false;
+    if(state.only === 'starred' && !starredSet.has(p.id)) return false;
+    if(state.minRel && (p.relevance||0) < state.minRel) return false;
+    if(state.methods.size && !state.methods.has(p.method)) return false;
+    if(state.tags.size && !(p.tags||[]).some(t => state.tags.has(t))) return false;
+    if(state.q && !(p._hay || '').includes(state.q)) return false;
+    return true;
+  });
+  const by = {
+    date:  (a,b) => (b.date_added||'').localeCompare(a.date_added||''),
+    rel:   (a,b) => (b.relevance||0) - (a.relevance||0) || (b.date_added||'').localeCompare(a.date_added||''),
+    year:  (a,b) => (b.year||0) - (a.year||0),
+    title: (a,b) => (a.title||'').localeCompare(b.title||'')
+  };
+  return out.sort(by[state.sort]);
+}
+
+/* ---------- list rendering ---------- */
+function render(){
+  const rows = visible();
+  syncToggle();
+  const unread = papers.filter(p => !readSet.has(p.id)).length;
+  el('count').textContent =
+    `${rows.length} of ${papers.length} · ${unread} unread`;
+
+  if(!rows.length){
+    el('list').innerHTML = `<p class="empty">Nothing matches these filters.</p>`;
+    return;
+  }
+
+  el('list').innerHTML = rows.map(p => {
+    const isRead = readSet.has(p.id);
+    const venue  = [p.venue, p.year].filter(Boolean).join(' · ');
+    return `
+    <article class="card ${isRead?'read':''}" data-id="${esc(p.id)}">
+      <button class="star ${starredSet.has(p.id)?'on':''}" data-star="${esc(p.id)}"
+              aria-label="Star this paper">${starredSet.has(p.id)?'★':'☆'}</button>
+      <h2><span class="unreaddot"></span>${esc(p.title)}</h2>
+      <p class="meta">${esc(authorLine(p))}${venue?' — '+esc(venue):''}</p>
+      <p class="tldr">${esc(p.tldr||'')}</p>
+      <div class="badges">
+        ${p.relevance?`<span class="rel" style="background:${relColor(p.relevance)}">${p.relevance}/5</span>`:''}
+        ${p.method?`<span class="badge method">${esc(p.method)}</span>`:''}
+        ${(p.tags||[]).slice(0,4).map(t=>`<span class="badge">${esc(t)}</span>`).join('')}
+        <span class="badge">added ${esc(p.date_added||'')}</span>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+/* Star toggling and opening a paper, again via delegation. */
+el('list').addEventListener('click', (ev) => {
+  const starBtn = ev.target.closest('[data-star]');
+  if(starBtn){
+    const id = starBtn.dataset.star;
+    starredSet.has(id) ? starredSet.delete(id) : starredSet.add(id);
+    persist(); render();
+    return;                       // don't also open the paper
+  }
+  const card = ev.target.closest('.card');
+  if(card) open(card.dataset.id);
+});
+
+/* ---------- detail view ---------- */
+async function open(id){
+  const p = papers.find(x => x.id === id);
+  if(!p) return;
+
+  readSet.add(id); persist();     // opening a paper marks it read
+
+  const venue = [p.venue, p.year].filter(Boolean).join(' · ');
+  el('detail').innerHTML = `
+    <button class="back" id="back">‹ Back to list</button>
+    <h2>${esc(p.title)}</h2>
+    <p class="dmeta">${esc((p.authors||[]).join(', '))}${venue?'<br>'+esc(venue):''}</p>
+    <div class="badges">
+      ${p.relevance?`<span class="rel" style="background:${relColor(p.relevance)}">${p.relevance}/5 relevance</span>`:''}
+      ${p.method?`<span class="badge method">${esc(p.method)}</span>`:''}
+      ${(p.tags||[]).map(t=>`<span class="badge">${esc(t)}</span>`).join('')}
+    </div>
+    <div class="actions">
+      ${p.link?`<a class="btn primary" href="${esc(p.link)}" target="_blank" rel="noopener">Open full paper ↗</a>`:''}
+      <button class="btn" id="starBtn">${starredSet.has(id)?'★ Starred':'☆ Star'}</button>
+      <button class="btn" id="unreadBtn">Mark unread</button>
+    </div>
+    <div class="body" id="body"><p style="color:var(--text-dim)">Loading summary…</p></div>
+    ${p.source_file?`<p class="srcfile">Source file in iCloud → To Process → Processed:<br><code>${esc(p.source_file)}</code></p>`:''}
+  `;
+  el('list').style.display = 'none';
+  el('detail').classList.add('show');
+  document.body.classList.add('reading');
+  window.scrollTo(0,0);
+
+  el('back').onclick = close;
+  el('starBtn').onclick = (e) => {
+    starredSet.has(id) ? starredSet.delete(id) : starredSet.add(id);
+    persist(); e.target.textContent = starredSet.has(id) ? '★ Starred' : '☆ Star';
+  };
+  el('unreadBtn').onclick = () => { readSet.delete(id); persist(); close(); };
+
+  // Load the full summary only now.
+  try{
+    const r = await fetch(`summaries/${encodeURIComponent(id)}.html`);
+    el('body').innerHTML = r.ok ? await r.text()
+      : '<p style="color:var(--text-dim)">Summary file missing.</p>';
+  }catch(e){
+    el('body').innerHTML = '<p style="color:var(--text-dim)">Could not load the summary.</p>';
+  }
+}
+
+function close(){
+  document.body.classList.remove('reading');
+  el('detail').classList.remove('show');
+  el('list').style.display = '';
+  render();
+  history.replaceState(null,'','#');
+}
+
+/* ---------- boot ---------- */
+(async function init(){
+  try{
+    const r = await fetch('data/index.json', {cache:'no-cache'});
+    const d = await r.json();
+    papers = d.papers || [];
+  }catch(e){
+    el('list').innerHTML = `<p class="empty">Could not load data/index.json.<br>
+      If this is a brand-new site, the first nightly run hasn't happened yet.</p>`;
+    return;
+  }
+  // Pre-compute one lowercase haystack per paper so search stays instant.
+  papers.forEach(p => {
+    p._hay = [p.title, (p.authors||[]).join(' '), p.venue, p.tldr,
+              (p.tags||[]).join(' '), p.method, p.search_text]
+             .filter(Boolean).join(' ').toLowerCase();
+  });
+  buildFilters();
+  if(window.matchMedia('(min-width: 700px)').matches){
+    el('filters').hidden = false;
+    el('ftoggle').setAttribute('aria-expanded', 'true');
+  }
+  render();
+})();
+</script>
+</body>
+</html>
