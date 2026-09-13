@@ -1,6 +1,122 @@
 {
-  "generated": "2026-09-12T15:09:34Z",
+  "generated": "2026-09-13T09:27:45Z",
   "papers": [
+    {
+      "title": "Agentic Markets: Game Dynamics and Equilibrium in Markets with Learning Agents",
+      "authors": [
+        "Martin Bichler",
+        "Julius Durmann",
+        "Matthias Oberlechner"
+      ],
+      "year": 2025,
+      "venue": "arXiv preprint (arXiv:2506.18571, cs.GT)",
+      "tags": [
+        "learning",
+        "algorithmic game theory",
+        "auctions",
+        "market design"
+      ],
+      "method": "theory",
+      "relevance": 4,
+      "link": "https://arxiv.org/abs/2506.18571",
+      "tldr": "Agents running projected gradient ascent converge to a Nash equilibrium essentially only when that equilibrium is strict, and even then only locally: the paper's counterexample shows a unique strict equilibrium can fail to attract from a positive-measure set of initial conditions. Worse for economics, discretizing a well-behaved game such as Cournot oligopoly (needed because auctions have discontinuous payoffs) destroys the monotonicity and strictness on which every convergence guarantee rests.",
+      "id": "2026-09-13-bichler-agentic-markets-game",
+      "date_added": "2026-09-13",
+      "source_file": "2026-01-27_Agentic_Markets_Game_Dynamics_and_Equilibrium_in_Markets_with_Learning_Agents_Martin_Bichler;_Julius_Durmann;_Matthias_Oberlechner.pdf"
+    },
+    {
+      "title": "Information Design and Mechanism Design: An Integrated Framework",
+      "authors": [
+        "Dirk Bergemann",
+        "Tibor Heumann",
+        "Stephen Morris"
+      ],
+      "year": 2026,
+      "venue": "Cowles Foundation Discussion Paper 2494 / arXiv:2601.17267 (survey chapter)",
+      "tags": [
+        "information design",
+        "mechanism design",
+        "auctions",
+        "robust mechanism design"
+      ],
+      "method": "theory",
+      "relevance": 4,
+      "link": "https://arxiv.org/abs/2601.17267",
+      "tldr": "Written in quantile space, optimal screening and optimal information disclosure are the same problem: maximize a linear functional under a majorization constraint, solved by concavification. When a designer chooses both the allocation and the buyers' information, pooling is always optimal (Theorem 3), because pooling values raises payments at second order while the allocative distortion is only third order; in efficient auctions optimal disclosure is upper censorship that keeps roughly two bidders competing at the top regardless of N.",
+      "id": "2026-09-13-bergemann-information-design-and",
+      "date_added": "2026-09-13",
+      "source_file": "2026-02-03_Information_Design_and_Mechanism_Design_An_Integrated_Framework_Dirk_Bergemann;_Tibor_Heumann;_Stephen_Morris.pdf"
+    },
+    {
+      "title": "From Conversations to Mechanisms: Aligning Advertiser Incentives in AI-Powered Product Recommendations",
+      "authors": [
+        "Dirk Bergemann",
+        "Marek Bojko",
+        "Paul Dütting",
+        "Renato Paes Leme",
+        "Haifeng Xu",
+        "Song Zuo"
+      ],
+      "year": 2026,
+      "venue": "Cowles Foundation Discussion Paper No. 2513, Yale University",
+      "tags": [
+        "mechanism design",
+        "auctions",
+        "algorithmic game theory"
+      ],
+      "method": "theory",
+      "relevance": 4,
+      "link": "https://elischolar.library.yale.edu/cowles-discussion-paper-series/2941/",
+      "tldr": "Conditioning advertiser transfers on the user feedback that a multi-round AI shopping conversation generates — purchases, exits, follow-up queries — makes each advertiser residual claimant on realized social surplus and yields periodic ex-post implementation of the efficient recommendation policy, escaping the Jehiel et al. (2006) impossibility for multidimensional interdependent values without any external data. Participation and no-subsidy can each be secured by a pivotal Groves term, but jointly only when the platform's own data makes advertisers' private signals redundant.",
+      "id": "2026-09-13-bergemann-from-conversations-to",
+      "date_added": "2026-09-13",
+      "source_file": "2026-04-13_Dirk_Bergemann,_Marek_Bojko,_Paul_DÃ¼tting,_Renato_Paes_Leme,_Haifeng_Xu,_and_Song_Zuo_From_Conversations_to_Mechanisms_Aligning_Advertiser_Incentives_in_AI-Powered_Product_Recommendations.pdf"
+    },
+    {
+      "title": "Menu Pricing of Large Language Models",
+      "authors": [
+        "Dirk Bergemann",
+        "Alessandro Bonatti",
+        "Alex Smolin"
+      ],
+      "year": 2026,
+      "venue": "Cowles Foundation Discussion Paper No. 2502 (also CEPR DP21275; TSE WP 1670; arXiv:2502.07736)",
+      "tags": [
+        "mechanism design",
+        "industrial organization",
+        "nonlinear pricing"
+      ],
+      "method": "theory",
+      "relevance": 4,
+      "link": "https://arxiv.org/abs/2502.07736",
+      "tldr": "Under a homogeneous inference technology, a user's infinite-dimensional profile of task values collapses to a scalar aggregate type and the hidden allocation of tokens across tasks adds no incentive constraints, so optimal LLM pricing reduces to one-dimensional Mussa-Rosen screening. The optimum is a menu of committed-spend contracts (an upfront fee for a budget spent on tokens priced at marginal cost), which rationalizes observed maximum-spend, minimum-spend and linear pay-per-token API pricing.",
+      "id": "2026-09-13-bergemann-menu-pricing-of",
+      "date_added": "2026-09-13",
+      "source_file": "2026-04-13_Dirk_Bergemann_Menu_Pricing_of_Large_Language_Models.pdf"
+    },
+    {
+      "title": "Algorithmic Pricing and Algorithmic Collusion",
+      "authors": [
+        "Martin Bichler",
+        "Julius Durmann",
+        "Matthias Oberlechner"
+      ],
+      "year": 2025,
+      "venue": "Business & Information Systems Engineering 67(6), 971-979",
+      "tags": [
+        "algorithmic game theory",
+        "learning",
+        "industrial organization",
+        "regulation"
+      ],
+      "method": "survey",
+      "relevance": 3,
+      "link": "https://doi.org/10.1007/s12599-025-00965-z",
+      "tldr": "A BISE 'Catchword' overview arguing that algorithmic collusion is best understood as an instance of the unsolved learning-in-games problem: no-regret learners are only guaranteed to reach coarse correlated equilibrium, not Nash, and Bertrand competition falls outside the potential/monotone game classes where Nash convergence is known. It therefore remains unresolved whether observed supra-competitive prices reflect genuine tacit coordination or mere failure to converge -- which is exactly what antitrust policy would need to know.",
+      "id": "2026-09-13-bichler-algorithmic-pricing-and",
+      "date_added": "2026-09-13",
+      "source_file": "2026-01-27_Algorithmic_Pricing_and_Algorithmic_Collusion_Martin_Bichler.pdf"
+    },
     {
       "id": "2026-09-12-bergemann-procurement-without-priors",
       "title": "Procurement without Priors: A Simple Mechanism and its Notable Performance",
