@@ -156,6 +156,7 @@ main{padding-top:14px}
     <div class="titlebar">
       <h1>Reading Digest</h1>
       <span class="count" id="count"></span>
+      <span class="count" id="stamp"></span>
     </div>
     <input class="search" id="q" type="search" placeholder="Search title, author, venue, summary…"
            autocomplete="off" autocorrect="off" spellcheck="false">
@@ -230,7 +231,7 @@ function buildFilters(){
         (state.only||'all')===v}">${t}</button>`).join(''));
 
   if(methods.length) html += row('Method', methods.map(m =>
-      `<button class="chip" data-kind="method" data-v="${esc(m)}" aria-pressed="false">${esc(m)}</button>`
+      `<button class="chip" data-kind="method" data-v="${esc(m)}" aria-pressed="${state.methods.has(m)}">${esc(m)}</button>`
     ).join(''));
 
   html += row('Relevance', [[0,'Any'],[3,'3+'],[4,'4+'],[5,'5 only']].map(([v,t]) =>
@@ -238,7 +239,7 @@ function buildFilters(){
     ).join(''));
 
   if(tags.length) html += row('Topic', tags.map(t =>
-      `<button class="chip" data-kind="tag" data-v="${esc(t)}" aria-pressed="false">${esc(t)} <span style="opacity:.6">${tagCounts[t]}</span></button>`
+      `<button class="chip" data-kind="tag" data-v="${esc(t)}" aria-pressed="${state.tags.has(t)}">${esc(t)} <span style="opacity:.6">${tagCounts[t]}</span></button>`
     ).join(''));
 
   html += row('Sort', [['date','Newest first'],['rel','Most relevant'],['year','Paper year'],['title','Title A–Z']]
@@ -394,7 +395,7 @@ async function open(id){
 
   // Load the full summary only now.
   try{
-    const r = await fetch(`summaries/${encodeURIComponent(id)}.html`);
+    const r = await fetch(`summaries/${encodeURIComponent(id)}.html`, {cache:'no-cache'});
     el('body').innerHTML = r.ok ? await r.text()
       : '<p style="color:var(--text-dim)">Summary file missing.</p>';
   }catch(e){
@@ -410,17 +411,49 @@ function close(){
   history.replaceState(null,'','#');
 }
 
-/* ---------- boot ---------- */
-(async function init(){
+/* ---------- loading, and re-loading ----------
+   The paper list lives in its own function rather than in the boot block below,
+   because it has to be runnable more than once. A web app launched from the iOS
+   home screen is *resumed* when you tap it, not reloaded: the page is kept alive
+   in the background and put back on screen. Anything that runs only at load time
+   would therefore never see papers added after the app was first opened, which is
+   exactly how this page used to go stale on the phone while looking fine in Safari.
+-------------------------------------------------------------------------------- */
+
+let loaded        = false;   // has a successful load happened at all?
+let lastGenerated = null;    // "generated" stamp of the data currently on screen
+let lastFetchAt   = 0;       // when we last fetched, so we don't hammer the server
+let fetching      = false;   // guard against overlapping refreshes
+
+/* Fetch the index. Returns true only when there is something NEW to draw, so a
+   routine check that finds nothing does not disturb the view you are reading. */
+async function loadIndex(){
+  let d;
   try{
-    const r = await fetch('data/index.json', {cache:'no-cache'});
-    const d = await r.json();
-    papers = d.papers || [];
+    // The query string defeats any cache sitting in front of us; cache:'no-cache'
+    // deals with the browser's own store.
+    const r = await fetch(`data/index.json?_=${Date.now()}`, {cache:'no-cache'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    d = await r.json();
   }catch(e){
-    el('list').innerHTML = `<p class="empty">Could not load data/index.json.<br>
-      If this is a brand-new site, the first nightly run hasn't happened yet.</p>`;
-    return;
+    // Offline, or caught mid-deploy. Keep showing whatever we already have.
+    if(!loaded){
+      el('list').innerHTML = `<p class="empty">Could not load data/index.json.<br>
+        If this is a brand-new site, the first nightly run hasn't happened yet.</p>`;
+    }
+    return false;
   }
+
+  lastFetchAt = Date.now();
+  const incoming = d.papers || [];
+  const isNew = !loaded
+             || (d.generated || null) !== lastGenerated
+             || incoming.length !== papers.length;
+  if(!isNew){ stampNow(); return false; }
+
+  papers = incoming;
+  lastGenerated = d.generated || null;
+  loaded = true;
   // Pre-compute one lowercase haystack per paper so search stays instant.
   papers.forEach(p => {
     p._hay = [p.title, (p.authors||[]).join(' '), p.venue, p.tldr,
@@ -428,11 +461,59 @@ function close(){
              .filter(Boolean).join(' ').toLowerCase();
   });
   buildFilters();
-  if(window.matchMedia('(min-width: 700px)').matches){
-    el('filters').hidden = false;
-    el('ftoggle').setAttribute('aria-expanded', 'true');
+  stampNow();
+  return true;
+}
+
+/* Re-check for new papers. Skips the request if we just made one, so flicking in
+   and out of the app doesn't fire a fetch every single time. */
+async function refresh(force){
+  if(fetching) return;
+  if(!force && Date.now() - lastFetchAt < 30000){ stampNow(); return; }
+  fetching = true;
+  try{
+    if(await loadIndex()) render();
+  }finally{
+    fetching = false;
   }
-  render();
+}
+
+/* Coming back to the foreground is the moment that matters on a phone. */
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') refresh();
+});
+/* Safari can restore a page from its back/forward cache without the visibility
+   ever changing, so catch that case separately. */
+window.addEventListener('pageshow', (ev) => { if(ev.persisted) refresh(); });
+
+/* ---------- "updated ..." stamp ---------- */
+/* Shows how old the published data is, so a stale view can never look current. */
+function relTime(iso){
+  const then = Date.parse(iso || '');
+  if(isNaN(then)) return '';
+  const mins = Math.max(0, Math.round((Date.now() - then) / 60000));
+  if(mins < 2)  return 'just now';
+  if(mins < 60) return mins + ' min ago';
+  const hrs = Math.round(mins / 60);
+  if(hrs < 24)  return hrs + (hrs === 1 ? ' hour ago' : ' hours ago');
+  const days = Math.round(hrs / 24);
+  return days + (days === 1 ? ' day ago' : ' days ago');
+}
+function stampNow(){
+  const t = relTime(lastGenerated);
+  el('stamp').textContent = t ? '\u00b7 updated ' + t : '';
+}
+
+/* ---------- boot ---------- */
+(async function init(){
+  if(await loadIndex()){
+    if(window.matchMedia('(min-width: 700px)').matches){
+      el('filters').hidden = false;
+      el('ftoggle').setAttribute('aria-expanded', 'true');
+    }
+    render();
+  }
+  setInterval(stampNow, 60000);   // keep the relative time honest while open
 })();
 </script>
 </body>
