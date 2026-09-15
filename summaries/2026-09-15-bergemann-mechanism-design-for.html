@@ -1,0 +1,214 @@
+<p><strong>The one thing to learn from this paper:</strong> the
+alignment problem has the shape of a <strong>screening problem with
+one-sided evidence</strong>, and once you write it that way the standard
+mechanism-design machinery comes back to life almost intact. An AI
+agent’s type has two parts — its <strong>alignment</strong>
+(preferences) and its <strong>capability</strong> (what it can do and
+what it knows) — and the decisive structural assumption is an
+<strong>asymmetry in imitation</strong>: a capable agent can
+<em>conceal</em> capability (sandbag) but a weak agent cannot
+<em>counterfeit</em> it. That single assumption buys a revelation
+principle in which incentive compatibility must deter <strong>double
+deviations</strong> (misreport, then disobey), and a tight
+implementability characterization — <strong>nested cyclical
+monotonicity</strong> — with one cycle condition supporting
+<em>obedience</em> within each report and a second supporting
+<em>honesty</em> across reports.</p>
+<h3 id="what-the-researchers-do">1. What the researchers do</h3>
+<p>They build a mechanism-design framework in which the agent is an AI
+system and the designer is a human who wants it to act on her behalf but
+knows neither what it wants nor what it can do.</p>
+<p>An agent’s <strong>type</strong> is a tuple t = (A[t], u[t], h[t],
+pi[t]): feasible action set, payoff function, belief about the state,
+and information (a Blackwell experiment). The designer commits to a
+<strong>reward schedule</strong> over actions and states, where a reward
+of minus infinity means “prohibited” — so the framework covers
+permissions and delegation sets as well as smooth reward shaping.</p>
+<p>Two features distinguish this from classical screening. First,
+<strong>the agent acts rather than reports</strong>: it sends a message,
+receives a reply, <em>then</em> privately observes a signal,
+<em>then</em> chooses an action. Incentive compatibility must therefore
+deliver both <strong>honesty</strong> and <strong>obedience</strong>,
+and must block the joint deviation “pretend to be weaker, then take the
+action I actually wanted”. Second, reports are constrained by a
+<strong>verification order</strong>, written t ⊵ t-hat (Green–Laffont):
+t ⊵ t-hat means t can pass every test t-hat can. In the leading
+specification this holds exactly when A[t] contains A[t-hat] and pi[t]
+Blackwell-dominates pi[t-hat]. This is <strong>hard evidence that can be
+withheld but not fabricated</strong> — exactly the empirical pattern the
+AI-safety literature documents, where models underperform on
+dangerous-capability evaluations but cannot manufacture capabilities
+they lack.</p>
+<p>The paper extends this to many agents via a Mertens–Zamir universal
+type space, and works five stylized applications in a linear-quadratic
+environment: the human wants action to match state, v(a, theta) = -(a -
+theta)^2, while the AI has u_b(a, theta) = -(a - theta - b)^2 for an
+unknown bias b.</p>
+<h3 id="why-the-literature-cares">2. Why the literature cares</h3>
+<p>Because AI alignment is discussed almost entirely in mechanistic
+terms — interpretability, probes, circuits — while economics has a
+century of experience with a different move: <strong>shape behavior
+through incentives without understanding the machinery that produces
+it.</strong> As the authors put it, an auctioneer raises revenue without
+a theory of the brain.</p>
+<p>The empirical hooks are real. Models have been documented
+<strong>faking alignment</strong> during training,
+<strong>scheming</strong> in evaluations, and <strong>strategically
+underperforming</strong> when told a high score triggers restriction.
+Meanwhile every frontier lab runs a policy mapping evaluation scores
+into deployment permissions — Anthropic’s RSP, DeepMind’s Frontier
+Safety Framework, OpenAI’s Preparedness Framework. The paper’s
+observation is that <strong>these policies are mechanisms in the formal
+sense</strong>, and if the score is chosen strategically they should be
+designed as such.</p>
+<p>For a theorist the appeal is different: this is a <strong>screening
+problem with an unknown action set</strong>, which is not a standard
+object. Carroll (2015) is the nearest ancestor, and does not combine
+unknown action sets with unknown preferences <em>and</em> interim
+information <em>and</em> post-report action choice.</p>
+<h3 id="why-it-is-a-contribution-and-where-it-fits">3. Why it is a
+contribution, and where it fits</h3>
+<p>The contribution is the <strong>characterization</strong>, not the
+revelation principle (which follows the Myerson–Forges template).
+Proposition 2: a physically feasible deterministic policy is
+implementable by a state-independent mechanism if and only if</p>
+<ul>
+<li><strong>(O) within-report cycle condition</strong>: for every type t
+and every cycle of signals s_1, …, s_K, sum_k [ U_t(a(t, s_k), s_k) -
+U_t(a(t, s_(k+1)), s_k) ] &gt;= 0; and</li>
+<li><strong>(T) across-report cycle condition</strong>: supporting
+schedules can be chosen so that for every feasible type cycle, sum_k [
+G_(t_k)(t_k) - G_(t_k)(t_(k+1)) ] &gt;= 0, where G_t(t-hat) is what type
+t gets by reporting t-hat and then <strong>re-optimizing</strong> after
+its signal.</li>
+</ul>
+<p>Two nested potentials, one inside each report and one across reports.
+<strong>Table 1</strong> locates this cleanly: with no interim
+information and a complete report graph it collapses to <strong>Rochet
+(1987)</strong>; with both features, the nested version. The closest
+relative is <strong>Krähmer–Strausz (2017)</strong> on sequential
+screening, but that has one-dimensional linear preferences and an
+envelope formula. Here types, signals, actions and feasible sets are
+finite but <strong>unordered</strong> — no envelope theorem, no single
+crossing — hence cyclical monotonicity on a directed graph. Practically:
+for a fixed policy, implementability is a <strong>linear feasibility
+program</strong>; optimizing over policies is not.</p>
+<h3 id="the-key-results">4. The key results</h3>
+<p>The one to carry away is <strong>Proposition 3 (optimal
+caps)</strong> in the sandbagging application. Capability c gives the
+action set (-infinity, c], bias is a function b(c), and the human picks
+a cap a-bar(c-hat) as a function of the evaluation score. Two facts
+collide: a score is a <strong>lower</strong> bound on capability (you
+can fail a test you could pass, not pass one you cannot), so the cap
+schedule must be <strong>weakly increasing</strong> to be truthful; but
+the complete-information optimal cap is min{c, 1 - b(c)}, which
+<strong>falls</strong> with capability wherever bias rises with
+capability. Hence:</p>
+<ul>
+<li><strong>If bias falls with capability</strong> (more capable models
+are better aligned), the constraint does not bind and
+<strong>evaluations achieve the full-information payoff</strong> —
+screening works perfectly.</li>
+<li><strong>If bias rises with capability</strong>, no informative
+schedule is truthful; the optimum is a <strong>single common
+cap</strong> a* = 1 - sqrt( E[ b(c)^2 | c &gt; a* ] ) and
+<strong>elicitation is worthless</strong>.</li>
+<li><strong>If bias is non-monotone</strong>, the answer is an
+<strong>ironing</strong> problem: z* is the decreasing least-squares fit
+of squared bias subject to the capability bound, and the cap is
+a-bar<em>(c) = 1 - sqrt( z</em>(c) ). Intermediate types get pooled;
+verifiably very capable types get a looser cap.</li>
+</ul>
+<p>The prettiest comparative static is <strong>Proposition 5</strong>.
+Define <strong>mean alignment</strong> b-bar = E[b] and
+<strong>interpretability</strong> as the inverse of the dispersion
+sigma^2. Under full discretion the loss is b-bar^2 + sigma^2 — a
+bias–variance decomposition in which the two trade off one-for-one.
+Under the <em>optimal</em> mechanism the cap is a-bar* = 1 - sqrt(
+b-bar^2 + sigma^2 ), so alignment and interpretability are
+<strong>perfect substitutes in the instrument</strong>; but the
+optimized loss has cross-partial d^2 L* / (d b-bar d sigma^2) = -2 -
+b-bar / sqrt( b-bar^2 + sigma^2 ), which is negative, so they are
+<strong>complements in value</strong>. Better alignment earns more
+discretion, which gives interpretability more to protect; better
+interpretability makes that discretion safer. Under full discretion the
+cross-partial is zero — <strong>optimal control is what creates the
+complementarity.</strong> A striking corollary: more residual
+uncertainty about bias can <em>raise</em> the human’s payoff, because
+the cap truncates the bad realizations while leaving the good ones their
+discretion.</p>
+<p>On the multi-agent side, <strong>Example III</strong> is a
+Crémer–McLean-style benchmark: rewards for AI agents are cheap and
+unbounded, so when agents hold distinct higher-order beliefs, a proper
+score on co-player reports elicits honest types and <strong>any outcome
+is implementable</strong>. <strong>Example V</strong> (weak-to-strong
+oversight) is closest to practice: a weak monitor that cannot observe
+the state or act, but observes the strong agent’s alignment, regulates
+it through permissions, delegation sets or reward schedules — and the
+designer <strong>robustly attains the first best even without knowing
+the monitor’s own bias</strong>, by choosing the menu of schedules the
+monitor may pick from.</p>
+<h3 id="why-this-was-hard-and-not-done-before">5. Why this was hard and
+not done before</h3>
+<p>The obstacle was never the revelation principle; it was that
+<strong>the natural model has no order on it</strong>. Classical
+screening leans on single crossing, an envelope formula and a
+one-dimensional type. Here the type has both a preference and a
+capability component, the capability component is a <em>set</em>, the
+report graph is <em>incomplete</em> (only downward reports are
+feasible), and information arrives <em>after</em> reporting, so the
+agent can disobey in a signal-dependent way. Together these kill the
+envelope approach, and cyclical monotonicity on a directed graph is what
+remains. The second precondition was empirical: sandbagging and
+alignment faking had to be <strong>documented</strong> before
+“capabilities can be concealed but not counterfeited” read as a modeling
+assumption rather than a contrivance.</p>
+<h3 id="where-this-would-not-do-well">6. Where this would not do
+well</h3>
+<ul>
+<li><strong>It is static.</strong> Real agents act over long
+trajectories and designers re-optimize as they watch. Letting A be the
+space of trajectories is formally correct and analytically hollow; the
+authors flag dynamic mechanism design as the main gap.</li>
+<li><strong>The applications are linear-quadratic and deliberately
+stylized</strong>, with bias projected onto one dimension so capability
+and alignment move together — which is where the sharp comparative
+statics come from, and exactly the assumption one should not
+believe.</li>
+<li><strong>It assumes commitment and partial implementation.</strong>
+The target policy need only be <em>an</em> equilibrium, not the unique
+one, and collusion among agents is explicitly left open — which matters
+a great deal for the multi-agent examples.</li>
+<li><strong>The multi-agent results lean hard on beliefs.</strong>
+Example III inherits Crémer–McLean fragility: unbounded costless rewards
+and rich heterogeneity in higher-order beliefs, which current systems
+may not have at all.</li>
+<li><strong>“AI preferences” is load-bearing</strong>, and a system
+whose measured preferences shift with the prompt is not obviously the
+agent of this model. There is also no empirical content yet — everything
+is illustration.</li>
+</ul>
+<h3 id="how-to-cite-refer-to-this-paper">7. How to cite / refer to this
+paper</h3>
+<p>Cite it as the paper that <strong>imports screening with partial
+verification into AI alignment</strong>, organized around the
+<strong>one-sided imitation structure</strong> (capabilities can be
+concealed but not counterfeited), with <strong>nested cyclical
+monotonicity</strong> characterizing implementable policies when the
+agent must be both honest and obedient.</p>
+<blockquote>
+<p>Bergemann, D., A. Koh, and S. Morris (2026): “Mechanism Design for
+Alignment and Control,” arXiv:2609.01595 [econ.TH].</p>
+</blockquote>
+<p>The most portable pieces: (i) the <strong>verification-order
+formalism</strong>, useful well outside AI — procurement
+prequalification, certification, licensing — wherever agents hold
+evidence they can withhold but not fake; (ii) the <strong>(O)/(T) cycle
+conditions</strong> as the right generalization of Rochet when types are
+unordered and the report graph is incomplete; (iii) <strong>Proposition
+5</strong> on alignment and interpretability as substitutes in
+instrument but complements in value; and (iv) <strong>Proposition
+3</strong> as a clean ironing result for evaluation-conditioned
+permissions. For the ancestors instead: Green–Laffont (1986), Rochet
+(1987), Holmström (1979), Amador–Werning–Angeletos (2006) and
+Krähmer–Strausz (2017).</p>

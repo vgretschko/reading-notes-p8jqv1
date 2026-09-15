@@ -1,0 +1,199 @@
+<p><strong>The one thing to learn from this paper:</strong> the pipeline
+that produces a modern language model is, step for step, <strong>a stack
+of microeconomic problems that already have names</strong>. Reward
+modeling <em>is</em> conditional logit. Aggregating annotator judgments
+<em>is</em> social choice — and the standard implementation turns out to
+be Borda count, chosen by nobody. Reward hacking <em>is</em> the
+Holmström–Milgrom multitask problem. Scaling laws <em>are</em> a
+Cobb–Douglas production function. This is a <strong>guide, not a
+research paper</strong>: its value is as a map of where a mechanism
+designer’s existing tools already bite on problems currently being
+solved without them, plus a concrete route in.</p>
+<h3 id="what-the-authors-do">1. What the authors do</h3>
+<p>Two things, in two parts.</p>
+<p><strong>Part I</strong> is a self-contained primer on how a language
+model is trained, written for economists, followed by a systematic
+mapping from microeconomic fields to open AI problems. The primer covers
+the three-stage RLHF pipeline — supervised fine-tuning, then
+<strong>reward modeling</strong> (annotators compare response pairs; a
+model learns to predict those comparisons and outputs a scalar score),
+then <strong>policy optimization</strong> (fine-tune the model to
+maximize that score, with a KL penalty against drifting too far). It
+also covers the main variants: DPO, which collapses stages 2 and 3 into
+one supervised objective; Constitutional AI / RLAIF, where the judge is
+another model scoring against written principles; and
+<strong>RLVR</strong> (reinforcement learning from verifiable rewards),
+which trains against automatically checkable outcomes — does the proof
+check, does the code pass the tests — and now drives most of the
+progress in reasoning.</p>
+<p><strong>Part II</strong> is career infrastructure: the roles that
+exist (research scientist, research engineer, policy/governance
+researcher), what each demands technically, the gaps economists
+typically have, a tiered reading list, and a maintained repository of
+fellowships and programs.</p>
+<h3 id="why-the-literature-cares">2. Why the literature cares</h3>
+<p>Because the direction of travel in the economics-of-AI literature has
+been almost entirely one-way. Acemoglu–Restrepo, Brynjolfsson and others
+ask <em>what AI does to the economy</em> — labor markets, productivity,
+firms. This guide <strong>inverts the question</strong>: what can
+applied microeconomics do to improve AI systems themselves? That is a
+much thinner literature and a much larger opportunity.</p>
+<p>The authors’ claim about timing is the persuasive part. Decisions
+about <strong>how feedback is elicited, whose preferences count, and how
+they are combined</strong> are being made right now, at scale, in
+systems used by hundreds of millions of people — and they are being made
+largely without the formal apparatus economics built for exactly this.
+Siththaranjan et al.’s finding is the emblematic case: standard reward
+modeling <strong>implicitly aggregates conflicting annotators by
+something equivalent to Borda count</strong>. No one chose Borda. It
+fell out of the estimator. An economist looks at that and immediately
+asks which axioms it satisfies, what it does to minorities, and what the
+alternatives are — which is a research agenda arriving fully formed.</p>
+<p>The guide also points repeatedly at the <strong>UK AI Safety
+Institute’s alignment agenda</strong>, which explicitly names cheap
+talk, verifiable disclosure, Bayesian persuasion, delegation, robust
+mechanism design, collusion and cooperation as priority areas and is
+funding work on them. The demand side here is real and institutional,
+not hypothetical.</p>
+<h3 id="why-it-is-a-contribution-and-where-it-fits">3. Why it is a
+contribution, and where it fits</h3>
+<p>It is not a theoretical contribution, and the authors say so. Its
+contribution is <strong>coordination</strong>: scattered results —
+Conitzer et al. on RLHF-as-social-choice, Maura-Rivero et al. connecting
+Nash Learning from Human Feedback to <strong>maximal lotteries</strong>,
+Hadfield-Menell and Hadfield on alignment as incomplete contracting,
+Carroll’s linear contracts under unknown action sets, Igami translating
+RL into structural econometrics — are pulled into one frame, so an
+economist can see where their particular tool attaches.</p>
+<p>The framing device is methodological. Machine learning has succeeded
+by <strong>minimizing structural assumptions</strong> and letting
+flexible models find regularities (Breiman’s “algorithmic” culture,
+Sutton’s “bitter lesson”); economics imposes theory to recover
+interpretable, policy-invariant parameters. The implicit argument is
+that the problems now facing AI labs — which preferences to aggregate,
+how to elicit honest effort, how to keep oversight as capability grows —
+are <strong>exactly where the structural approach earns its
+keep</strong>, because they are normative and strategic rather than
+predictive.</p>
+<h3 id="the-key-equivalence">4. The key equivalence</h3>
+<p>There is no theorem; the load-bearing object is the equivalence at
+the heart of reward modeling. The Bradley–Terry model gives the
+probability that response y_1 is preferred to y_2 for prompt x as P(y_1
+preferred to y_2 | x) = exp( r(x, y_1) ) / [ exp( r(x, y_1) ) + exp(
+r(x, y_2) ) ] = sigma( r(x, y_1) - r(x, y_2) ), which is <strong>exactly
+McFadden’s conditional logit</strong>. The learned reward r plays the
+role of indirect utility; the annotator picks the option maximizing
+utility plus an i.i.d. Type-I extreme value shock; fitting the reward
+model by maximum likelihood <em>is</em> conditional logit estimation
+under a random utility model. DPO and PPO inherit this structure.</p>
+<p>The authors’ point is that this is <strong>not a relabeling</strong>,
+because once you read it as discrete choice, a single training step
+fractures into a cluster of familiar problems:</p>
+<ul>
+<li><strong>Econometrics.</strong> Annotator disagreement is
+<em>heterogeneity</em>, not noise. Mixed logit and random coefficients
+(BLP) would recover a whole distribution of preferences rather than a
+single representative one — the technical foundation for per-user or
+per-community behavior. And which prompts are compared, by whom, is a
+<strong>selection problem</strong>.</li>
+<li><strong>Social choice.</strong> Fitting one reward model silently
+merges conflicting preferences, giving an unexamined answer to
+<em>aligned to whom?</em> Impossibility results constrain what alignment
+can achieve, whether or not anyone in the room knows them.</li>
+<li><strong>Mechanism design.</strong> Annotators are paid per
+comparison, under time pressure, on subjective questions. Theory
+predicts they will <strong>satisfice</strong>, not report honestly — and
+the standard fixes (majority voting, gold-standard questions) treat that
+as noise. <strong>Peer prediction</strong> (Miller et al. 2005) and the
+<strong>Bayesian truth serum</strong> (Prelec 2004) are designed for
+precisely this: eliciting truthful reports when ground truth is
+unobservable.</li>
+<li><strong>Contract theory.</strong> Reward hacking is
+<strong>Goodhart’s Law</strong>, i.e. Holmström–Milgrom multitask moral
+hazard: tie incentives to a measurable dimension and the agent neglects
+the unmeasured ones. Early RLHF models learned to be verbose because
+annotators preferred longer answers, so the model optimized
+<em>length</em> at the expense of accuracy and brevity.</li>
+<li><strong>Information design.</strong> <strong>Sycophancy</strong> is
+a signaling game: the model has learned that confirming a user’s stated
+prior earns higher reward than correcting it. Communication is not
+babbling — it is informative on neutral topics and
+<strong>systematically distorted</strong> exactly where the user signals
+a strong prior. Kamenica–Gentzkow sharpens the worry: a sender who
+designs the information structure can manipulate a fully rational, fully
+aware receiver, which raises the question the AISI agenda poses directly
+— can a model <em>known</em> to be misaligned be deployed safely?</li>
+<li><strong>Game theory.</strong> Safety proposals that rely on AI
+systems competing (debate, multi-model oversight, red team / blue team)
+can be undone if the systems <strong>collude</strong> — and unlike
+humans, AI agents can potentially share source code, verify each other’s
+strategies, and credibly commit. Tennenholtz’s <strong>program
+equilibrium</strong> already shows cooperation sustained in one-shot
+games, which classical game theory rules out.</li>
+<li><strong>Production economics.</strong> Scaling laws relate loss to
+compute, model size and data; for a fixed budget the trade-off is an
+<strong>isoquant</strong> and the fitted exponents behave like
+<strong>Cobb–Douglas factor shares</strong>. The guide is careful about
+the limits of the analogy: the usual obstacle to estimating production
+functions is endogeneity, and scaling-law experiments do not have it,
+because the researcher sets the inputs.</li>
+</ul>
+<h3 id="why-this-was-hard-and-not-done-before">5. Why this was hard and
+not done before</h3>
+<p>Mostly because it required standing in two places at once. The
+equivalences are individually not deep — a good IO student would spot
+Bradley–Terry as conditional logit in an afternoon — but spotting them
+requires knowing what happens inside an RLHF pipeline, which is in no
+economics curriculum, and the ML literature that does know has no reason
+to reach for McFadden. The guide’s second half exists because that gap
+is <strong>practical rather than intellectual</strong>: most lab roles
+expect the full technical stack (PyTorch, Hugging Face, distributed
+training, LeetCode-style interviews), purely theoretical positions are
+“relatively rare,” and the credible paths for most economists are
+collaboration, publication at NeurIPS/ICML/EC, or governance work.</p>
+<h3 id="where-this-would-not-do-well">6. Where this would not do
+well</h3>
+<ul>
+<li><strong>It is a map, not a destination.</strong> Nothing here is a
+result. Anyone hoping for a theorem will be disappointed; the payoff is
+orientation.</li>
+<li><strong>Some equivalences are advertised harder than they
+deliver.</strong> “Scaling laws are production functions” is a genuine
+structural analogy that the authors then largely deflate themselves.
+Others — behavioral economics for annotator bias — are more <em>this
+literature is relevant</em> than <em>here is the mapping</em>.</li>
+<li><strong>The shelf life is short.</strong> The primer centers RLHF at
+a moment when the authors themselves say RLVR is displacing it, and Part
+II admits its lists date within a year (hence the repository).</li>
+<li><strong>Skewed toward alignment and post-training.</strong>
+Auctions, matching, procurement, energy and spectrum markets get little.
+A market designer will find the compute-governance material (permit
+markets and auctions for training compute, IO of the chip and cloud
+supply chain, export controls) the most interesting thing here, and will
+also find it is one paragraph.</li>
+<li><strong>Little critical distance.</strong> It is an advocacy
+document, and does not entertain the possibility that some equivalences
+are too loose to generate results, or that the “bitter lesson” applies
+to economic structure too.</li>
+</ul>
+<h3 id="how-to-cite-refer-to-this-paper">7. How to cite / refer to this
+paper</h3>
+<p>Cite it as an <strong>orientation piece</strong>, not as evidence for
+a claim: the paper that maps the RLHF pipeline onto microeconomic tools
+and lays out entry points for economists into AI research.</p>
+<blockquote>
+<p>Kireyev, P. and R.-R. Maura-Rivero (2026): “From Microeconomics to AI
+Research: A Guide for Economists,” SSRN working paper 6948398.</p>
+</blockquote>
+<p>Best used (i) in an introduction, to justify in one sentence why a
+mechanism-design paper addresses an AI training problem; (ii) as a
+<strong>teaching resource</strong> — the RLHF primer is the clearest
+short treatment for an economics audience, and the tiered reading list
+is a ready-made syllabus for a PhD reading group; (iii) as a
+<strong>pointer to primary sources</strong>, since for any specific
+claim cite the underlying work instead — Conitzer et al. (2024),
+Siththaranjan et al. (2024) for the implicit Borda result, Maura-Rivero
+et al. (2025) for maximal lotteries, Hadfield-Menell and Hadfield
+(2019), Carroll (2015), Igami (2020); and (iv) for students asking how
+to move into this area, where Part II and the repository are the actual
+deliverable.</p>

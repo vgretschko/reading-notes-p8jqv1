@@ -1,0 +1,210 @@
+<p><strong>The one thing to learn from this paper:</strong> the profit a
+seller gives up by replacing the optimal nonlinear price schedule with a
+<strong>two-part tariff — a fixed fee plus a constant markup over
+production cost —</strong> is controlled by <strong>one number</strong>,
+the elasticity of marginal cost, m, and by nothing else. Set the markup
+equal to m, choose the fee optimally, and you are guaranteed at least m
+/ (m+1)^(1 + 1/m) of the optimal profit <strong>for every regular value
+distribution</strong>. For monomial costs C(q) = q^k / k that guarantee
+is k^(-1/(k-1)), never below 1/e (about 37%), and <strong>rising to 1 as
+costs get more convex</strong>. Simplicity is nearly free exactly where
+two-part tariffs are actually used — cloud, utilities, telecoms,
+congestion-prone capacity — because those are the markets with steeply
+rising marginal cost.</p>
+<h3 id="what-the-researchers-do">1. What the researchers do</h3>
+<p>A monopolist sells a <strong>divisible</strong> good to a single
+buyer with private per-unit value v drawn from F, producing q units at a
+strictly increasing, strictly convex cost C(q). Since Mussa–Rosen (1978)
+we know the optimal mechanism: allocate x(v) maximizing x phi(v) - C(x)
+pointwise, where phi(v) = v - (1 - F(v)) / f(v) is the virtual value.
+The resulting price schedule depends on every detail of F and C, and can
+be arbitrarily complicated.</p>
+<p>Firms do not do this. They post a <strong>two-part tariff</strong>
+(T, beta): pay T to join, then pay (1 + beta) C(q) for any quantity q
+you want. The paper asks the <strong>approximation</strong> question:
+for a given cost function, is there a pair (T, beta) — allowed to depend
+on F — such that pi(T, beta) &gt;= rho pi*, for a constant rho that is
+<strong>independent of F</strong>?</p>
+<p>The organizing primitive is the <strong>elasticity of marginal
+cost</strong>, eta(q) := q C’‘(q) / C’(q), which measures the percentage
+change in marginal cost per percentage change in quantity. For monomial
+costs it is constant and equals k - 1. The paper’s assumptions are a
+lower bound eta &gt;= m &gt; 0 and, optionally, an upper bound eta &lt;=
+M.</p>
+<p>The paper then works through: an exactly-solved Pareto/monomial
+example; the general regular case; the non-regular case and menus;
+multiple product lines; and an extension to nonlinear buyer values.</p>
+<h3 id="why-the-literature-cares">2. Why the literature cares</h3>
+<p>Two reasons, and they point in different directions.</p>
+<p>The first is <strong>the simplicity-versus-optimality
+program</strong> in mechanism design — Hartline–Roughgarden, Chawla et
+al., Cai et al., Babaioff et al. — which is almost entirely about
+<strong>indivisible</strong> goods: posted prices approximating optimal
+auctions, selling separately versus bundling. Nonlinear pricing with a
+genuinely divisible good and a real production cost has been nearly
+untouched since Wilson’s 1993 monograph, which asked how a <em>finite
+menu</em> of quantity–payment pairs approximates the optimum. That
+restricts menu <strong>cardinality</strong>; this paper restricts the
+<strong>functional form</strong> instead, and lets the buyer choose
+freely from a continuum — orthogonal axes of simplicity, and the
+functional-form one is what firms actually use.</p>
+<p>The second reason is that <strong>this contract class is the
+procurement class</strong>. A fixed fee plus a constant share of cost is
+exactly the cost-plus-fixed-fee / incentive-contract family of
+Laffont–Tirole (1993), McAfee–McMillan (1986) and Bajari–Tadelis (2001).
+It is also, remarkably, where the <strong>prior-free</strong> literature
+lands: Bergemann et al. (2023) show that the markup maximizing the
+worst-case ratio of profit to social surplus when demand is unknown
+equals the <strong>elasticity of marginal cost</strong> — the same
+markup beta = m that shows up here as the Bayesian approximation-optimal
+markup. Two completely different robustness criteria select the same
+rule. That coincidence is worth a paper on its own.</p>
+<h3 id="why-it-is-a-contribution-and-where-it-fits">3. Why it is a
+contribution, and where it fits</h3>
+<p>This is the <strong>first distribution-free approximation guarantee
+for nonlinear pricing with convex production costs</strong>, and the
+structure of the answer is what makes it useful rather than merely new.
+The guarantee is:</p>
+<ul>
+<li><strong>distribution-free</strong> — one constant works for all
+regular F, and computing it needs only the cost function, not an
+estimate of F;</li>
+<li><strong>monotone in the right primitive</strong> — worse when costs
+are near-linear, better when they are convex, matching where the
+contract is actually observed;</li>
+<li><strong>tight</strong>, with matching impossibility results on both
+the elasticity bound and the regularity assumption.</li>
+</ul>
+<p>The proof strategy is the part worth stealing. The optimal profit is
+bounded above by a quantity that <strong>splits into exactly two pieces
+matching the two instruments</strong>: pi* &lt;= (1 - 1/k) * integral
+from v_0 to infinity of f(v) [ W(v_0) + C(q(v)) ] dv, where W(v) = max_q
+{ v q - C(q) } and v_0 = inf{ v : phi(v) &gt;= 0 }. The first term in
+the bracket is exactly what a <strong>fixed fee</strong> can collect;
+the second is exactly what a <strong>markup</strong> covers. One then
+only has to bound two ratios — q(v/(1+beta)) / q(v) and beta
+C(q(v/(1+beta))) / C(q(v)) — uniformly in v. <strong>Lemma 4.2</strong>
+does exactly that from the elasticity bounds: q(v/s) &gt;= s^(-1/m) q(v)
+for s &gt;= 1, and v q(v)/(M+1) &lt;= C(q(v)) &lt;= v q(v)/(m+1). The
+markup is functioning as a <strong>contraction of the type
+space</strong>, and the elasticity bound is precisely what controls how
+far that contraction moves the allocation.</p>
+<h3 id="the-key-theorem">4. The key theorem</h3>
+<p><strong>Theorem 1.</strong> If eta(q) &gt;= m for all q, then the
+<em>universal</em> markup beta := m admits, for every regular F, a fee T
+with pi(T, beta) &gt;= [ m / (m+1)^(1 + 1/m) ] * pi<em>, improving to [
+m / (m+1)^(1 + 1/m) ] </em> (M+1)/M if also eta &lt;= M.</p>
+<p>Note what “universal” is doing: the <strong>markup does not depend on
+F at all</strong>. Only the fee does. Specialized to C(q) = q^k / k (so
+m = M = k - 1) this reads pi(T, beta) &gt;= k^(-1/(k-1)) pi*, which
+rises from 1/e as k -&gt; 1 toward 1 as k -&gt; infinity
+(<strong>Proposition 4.1</strong>), and that ratio is
+<strong>tight</strong> — for every epsilon there is a regular F on which
+no two-part tariff does better.</p>
+<p>Three sharp complements:</p>
+<ul>
+<li><strong>Both instruments are needed.</strong> With Pareto values and
+monomial costs, the two-part tariff with beta = 1/(lambda - 1) and T =
+((k-1)/k) (1 + beta)^(-1/(k-1)) is <strong>exactly optimal</strong>
+(Proposition 3.1) — the virtual value is linear, so the markup
+reproduces phi exactly. But drop either piece and the approximation
+ratio becomes unbounded (Proposition 3.2). Pure markups and pure access
+fees both fail.</li>
+<li><strong>The elasticity bound is necessary.</strong> With C(q) = e^q
+- 1, where eta(q) = q tends to 0 at the bottom, no two-part tariff gets
+a non-negligible fraction of the optimum (Proposition 4.2).</li>
+<li><strong>Regularity is necessary, and the fix is a small
+menu.</strong> Beyond regularity, a single two-part tariff can be driven
+to an epsilon-fraction (Proposition 5.1) — one fixed fee cannot
+discriminate across types sitting in different ironing intervals. But
+<strong>Theorem 2</strong>: if the ironed virtual value has s ironing
+intervals, a menu of at most s + 1 entries sharing a <strong>common
+markup</strong> beta = m, differing only in fee and <strong>capacity
+cap</strong>, restores the same constant. The reading is attractive:
+<em>pay the same markup, and buy your way up to the next capacity tier
+with a larger fee.</em> And <strong>Theorem 3</strong> shows that of
+order s entries are unavoidable. So the required complexity scales with
+the <strong>intrinsic non-regularity of demand</strong>, not with the
+complexity of the optimal mechanism.</li>
+</ul>
+<p>For <strong>multiple product lines</strong> with independent values —
+where optimal menus can be unboundedly large (Daskalakis et al. 2017) —
+<strong>Theorem 4</strong> gives pi* &lt;= 4 SREV + 4 BREV, extending
+“sell separately or bundle” (Babaioff et al. 2020) from indivisible to
+divisible goods with costs, via the Cai et al. (2016) duality/flow
+framework. The bundling side turns out to be a <strong>two-part tariff
+with zero markup</strong>: pay one access fee, then buy everything
+<strong>at production cost</strong>.</p>
+<h3 id="why-this-was-hard-and-not-done-before">5. Why this was hard and
+not done before</h3>
+<p>The approximation toolkit was built for indivisible goods, where the
+allocation is a probability in [0, 1] and “simple” means a posted price.
+A <strong>convex production cost</strong> breaks that in several places
+at once: revenue no longer equals virtual value times allocation, the
+benchmark pi* has no closed form, the Cai et al. duality framework needs
+reworking to carry a cost term, and even the <em>definition</em> of the
+bundling benchmark is unclear (a zero-markup access fee is not an
+obvious guess). The natural intuition is also wrong in an instructive
+way: as k -&gt; infinity the monomial cost looks like unit supply, where
+Myerson makes posted pricing exactly optimal for <strong>any</strong>
+distribution, so one expects the non-regular case to get easy for large
+k. It does not — the worst-case distribution moves with k (Proposition
+5.1). Finally, identifying <strong>marginal-cost elasticity</strong> as
+<em>the</em> sufficient statistic, rather than curvature or a bound on
+C’’, is what makes a unit-free, distribution-free constant possible at
+all.</p>
+<h3 id="where-this-would-not-do-well">6. Where this would not do
+well</h3>
+<ul>
+<li><strong>One buyer, one seller, no competition.</strong>
+Rochet–Stole-style competitive nonlinear pricing is out of scope.</li>
+<li><strong>Worst-case guarantees are conservative.</strong> 1/e is a
+floor over adversarial regular distributions; typical-case losses are
+presumably far smaller, and there is no average-case or empirical
+calibration.</li>
+<li><strong>The multi-product constant is loose.</strong> A factor of 4
+(8 across the two benchmarks) is qualitative, not a number a
+practitioner can act on.</li>
+<li><strong>Non-regularity is only handled through menu size.</strong>
+If s is large, the “simple” mechanism is not simple, and nothing here
+tells you s without knowing F — which is precisely what the
+distribution-free framing was meant to avoid.</li>
+<li><strong>The general nonlinear-value case is open.</strong>
+Multiplicatively separable values v U(q) reduce to the linear case by a
+change of variables (Proposition 7.1, with m replaced by a bound on
+(eta_C’ - eta_U’) / eta_U). For general supermodular u(v, q) there is
+only a <strong>conjecture</strong>, and the authors explain honestly why
+it is hard: the benchmark and the tariff guarantee are governed by
+opposite ends of the elasticity band, and an adversary can pull them
+apart.</li>
+<li><strong>No dynamics, no capacity constraints, no cost
+uncertainty</strong>, and the seller is assumed to know F in order to
+set the fee even though the markup is universal.</li>
+</ul>
+<h3 id="how-to-cite-refer-to-this-paper">7. How to cite / refer to this
+paper</h3>
+<p>Cite it as the paper that gives the <strong>first distribution-free
+approximation guarantee for two-part tariffs in nonlinear pricing with
+convex costs</strong>, with the guarantee <strong>m / (m+1)^(1 + 1/m),
+governed solely by the elasticity of marginal cost</strong>, tight, and
+with matching impossibility results for vanishing elasticity and for
+non-regular distributions.</p>
+<blockquote>
+<p>Bergemann, D., Y. Cai, J. Wu, and K. Zabarnyi (2026): “The
+Near-Optimality of Two-Part Tariffs for Nonlinear Pricing,” Cowles
+Foundation Discussion Paper No. 2534.</p>
+</blockquote>
+<p>Most useful as: (i) the <strong>theoretical foundation for
+cost-plus-fixed-fee contracting</strong> — the missing quantitative
+statement behind Laffont–Tirole and Bajari–Tadelis, and the natural
+citation when arguing that a procurement or utility tariff need not be
+optimal to be good enough; (ii) the source of the <strong>“set the
+markup equal to the elasticity of marginal cost”</strong> rule, striking
+precisely because Bergemann et al. (2023, 2025) reach it from a
+<strong>prior-free</strong> direction — cite the pair together to argue
+a rule is doubly robust; (iii) the <strong>menu-size result</strong>, an
+unusually concrete prescription that pricing complexity should scale
+with the number of ironing intervals in demand; and (iv) the
+<strong>divisible-goods extension of “selling separately or
+bundling”</strong>. For antecedents: Mussa–Rosen (1978) and Maskin–Riley
+(1984), Wilson (1993), and Cai et al. (2016).</p>

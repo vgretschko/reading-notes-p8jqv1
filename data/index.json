@@ -1,6 +1,95 @@
 {
-  "generated": "2026-09-13T09:27:45Z",
+  "generated": "2026-09-15T09:50:28Z",
   "papers": [
+    {
+      "title": "The Near-Optimality of Two-Part Tariffs for Nonlinear Pricing",
+      "authors": [
+        "Dirk Bergemann",
+        "Yang Cai",
+        "Jinzhao Wu",
+        "Konstantin Zabarnyi"
+      ],
+      "year": 2026,
+      "venue": "Cowles Foundation Discussion Paper No. 2534, Yale University",
+      "tags": [
+        "nonlinear pricing",
+        "mechanism design",
+        "procurement",
+        "industrial organization"
+      ],
+      "method": "theory",
+      "relevance": 5,
+      "link": "https://elischolar.library.yale.edu/cowles-discussion-paper-series/2975/",
+      "tldr": "A two-part tariff - fixed fee plus a constant markup over production cost - guarantees a fraction m/(m+1)^(1+1/m) of the optimal nonlinear-pricing profit for every regular value distribution, where m is the elasticity of marginal cost. The bound is tight, rises to 1 as costs become more convex, and fails entirely without an elasticity floor or under non-regularity, where a menu with one entry per ironing interval restores it. This is the quantitative foundation for cost-plus-fixed-fee procurement contracts, and it selects the same markup the prior-free literature does.",
+      "id": "2026-09-15-bergemann-the-near-optimality-of",
+      "date_added": "2026-09-15",
+      "source_file": "d2534_0.pdf"
+    },
+    {
+      "title": "Mechanism Design for Alignment and Control",
+      "authors": [
+        "Dirk Bergemann",
+        "Andrew Koh",
+        "Stephen Morris"
+      ],
+      "year": 2026,
+      "venue": "arXiv preprint (arXiv:2609.01595, econ.TH)",
+      "tags": [
+        "mechanism design",
+        "ai alignment",
+        "contract theory"
+      ],
+      "method": "theory",
+      "relevance": 4,
+      "link": "https://arxiv.org/abs/2609.01595",
+      "tldr": "Because AI capabilities can be concealed but not counterfeited, screening agents of unknown alignment and unknown capability admits a revelation principle - with incentive compatibility deterring double deviations, misreport then disobey - and a tight nested cyclical-monotonicity characterization that generalizes Rochet to unordered types and incomplete report graphs. Evaluations attain the full-information payoff when bias falls with capability and are worthless when it rises; alignment and interpretability are substitutes in the instrument but complements in value.",
+      "id": "2026-09-15-bergemann-mechanism-design-for",
+      "date_added": "2026-09-15",
+      "source_file": "2609.01595v1.pdf"
+    },
+    {
+      "title": "Information Design for AI Proxies under Imperfect Recall",
+      "authors": [
+        "Matthew Levy",
+        "Balázs Szentes"
+      ],
+      "year": 2025,
+      "venue": "Working paper (December 2025)",
+      "tags": [
+        "information design",
+        "mechanism design",
+        "ai alignment"
+      ],
+      "method": "theory",
+      "relevance": 3,
+      "link": "https://scholar.google.com/scholar?q=Information+Design+for+AI+Proxies+under+Imperfect+Recall",
+      "tldr": "A revelation principle survives imperfect recall: any outcome distribution achievable when the receiver must play one stationary response rule at every stage is achievable by a direct mechanism that simply recommends actions and in which obedience is optimal. Conditioning tomorrow's signal on today's realized action strictly expands the implementable set exactly when the agent reaches some outcome only after disobeying and is not indifferent over it.",
+      "id": "2026-09-15-levy-information-design-for",
+      "date_added": "2026-09-15",
+      "source_file": "2026-01-27_Levy_Szentes_Information_Design_for_AI_Proxies_under_Imperfect_Recall.pdf"
+    },
+    {
+      "title": "From Microeconomics to AI Research: A Guide for Economists",
+      "authors": [
+        "Pavel Kireyev",
+        "Roberto-Rafael Maura-Rivero"
+      ],
+      "year": 2026,
+      "venue": "SSRN working paper 6948398",
+      "tags": [
+        "ai alignment",
+        "mechanism design",
+        "learning",
+        "behavioral"
+      ],
+      "method": "survey",
+      "relevance": 2,
+      "link": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6948398",
+      "tldr": "A guide rather than a result: the RLHF pipeline is a stack of familiar microeconomic problems - reward modeling is exactly McFadden's conditional logit, aggregating annotators is social choice (and the standard estimator implicitly runs Borda), reward hacking is Holmstrom-Milgrom multitask moral hazard, sycophancy is a signaling game, and scaling laws behave like a Cobb-Douglas production function - plus a practical route into AI research for economists.",
+      "id": "2026-09-15-kireyev-from-microeconomics-to",
+      "date_added": "2026-09-15",
+      "source_file": "ssrn-6948398.pdf"
+    },
     {
       "title": "Agentic Markets: Game Dynamics and Equilibrium in Markets with Learning Agents",
       "authors": [
