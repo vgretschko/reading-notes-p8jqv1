@@ -1,6 +1,49 @@
 {
-  "generated": "2026-09-15T09:50:28Z",
+  "generated": "2026-09-16T01:07:27Z",
   "papers": [
+    {
+      "title": "Dynamic Contracting",
+      "authors": [
+        "Alessandro Pavan"
+      ],
+      "year": 2025,
+      "venue": "Annual Review of Economics, forthcoming (working paper, August 2025)",
+      "tags": [
+        "mechanism design",
+        "contract theory",
+        "renegotiation",
+        "procurement"
+      ],
+      "method": "survey",
+      "relevance": 5,
+      "link": "https://faculty.wcas.northwestern.edu/apa522/Dynamic-contracting.pdf",
+      "tldr": "The survey of dynamic mechanism design by one of its architects. Its organizing result: the static Myerson distortion carries over verbatim except that the inverse hazard rate is multiplied by an impulse response measuring how much a later type still depends on the initial one - so distortions shrink exactly as fast as impulse responses decay, and vanish entirely after period 1 when types are independent and the agent has deep pockets. Sections 4-9 survey what breaks when those assumptions go, and Section 10 is an unusually explicit open-problems list, including that no fully canonical class of mechanisms is known under limited commitment.",
+      "id": "2026-09-16-pavan-dynamic-contracting",
+      "date_added": "2026-09-16",
+      "source_file": "Dynamic-contracting.pdf"
+    },
+    {
+      "title": "The Use of Artificial Intelligence for Auction Design",
+      "authors": [
+        "Peyman Khezr",
+        "Kendall Taylor"
+      ],
+      "year": 2026,
+      "venue": "Journal of Economic Surveys 40(1), 269-285",
+      "tags": [
+        "auctions",
+        "learning",
+        "algorithmic game theory",
+        "market design"
+      ],
+      "method": "survey",
+      "relevance": 3,
+      "link": "https://doi.org/10.1111/joes.70006",
+      "tldr": "Six model-free reinforcement-learning algorithms are set to bid against each other in pay-as-bid, generalized second-price and uniform-price multi-unit auctions. The efficiency ranking is robust - uniform price wins in every configuration - but the revenue ranking is not: with a mixed population of unequally competent learners pay-as-bid raises over twice what uniform price does at high supply, and that advantage disappears once all six bidders are the best algorithm (PPO), where generalized second-price leads instead. Simulated revenue rankings are therefore an artifact of how well the artificial bidders have learned.",
+      "id": "2026-09-16-khezr-the-use-of",
+      "date_added": "2026-09-16",
+      "source_file": "Journal of Economic Surveys - 2025 - Khezr - The Use of Artificial Intelligence for Auction Design.pdf"
+    },
     {
       "title": "The Near-Optimality of Two-Part Tariffs for Nonlinear Pricing",
       "authors": [

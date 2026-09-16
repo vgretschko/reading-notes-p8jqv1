@@ -1,0 +1,176 @@
+<p><strong>The one thing to learn from this paper:</strong> if you let
+six different <strong>model-free reinforcement-learning
+algorithms</strong> bid against each other in multi-unit auctions, the
+<strong>efficiency ranking of formats is robust but the revenue ranking
+is not</strong>. Uniform-price is the most efficient format in every
+configuration tested, no matter how well the algorithms have learned.
+Revenue, by contrast, flips: with a mixed population of unequally
+competent learners, pay-as-bid raises the most when supply is ample;
+with a homogeneous population of well-trained agents, generalized
+second-price raises the most and pay-as-bid raises the least. The
+practical lesson is that <strong>simulated revenue rankings are an
+artifact of how good your artificial bidders are</strong>, and should
+not be quoted as format comparisons without that qualifier.</p>
+<h3 id="what-the-researchers-do">1. What the researchers do</h3>
+<p>Khezr and Taylor survey six <strong>model-free reinforcement learning
+(RL)</strong> algorithms and ask whether they are usable as artificial
+bidders for studying auction design. The six are: tabular
+<strong>Q-learning</strong>, <strong>deep Q-learning (DQN)</strong>,
+<strong>vanilla policy gradient (VPG)</strong>, <strong>deep policy
+gradient (DPN)</strong>, <strong>advantage actor-critic (A2C)</strong>,
+and <strong>proximal policy optimization (PPO)</strong>. For each they
+explain the mechanics and give a plain advantages/disadvantages
+table.</p>
+<p>They then run an illustrative horse race. A seller offers K
+homogeneous units; six bidders each demand two units with private,
+diminishing marginal values drawn iid from U[0,10]. Three sealed-bid
+payment rules are compared:</p>
+<ul>
+<li><strong>Discriminatory price (DP)</strong>, also known as
+pay-as-bid: winners pay their own bids.</li>
+<li><strong>Generalized second price (GSP)</strong>: each winner pays
+the bid ranked immediately below their own.</li>
+<li><strong>Uniform price (UP)</strong>: all winners pay the highest
+losing bid, i.e. the (K+1)-th highest bid.</li>
+</ul>
+<p>Each of the six algorithms is one bidder. Each combination of format
+and supply (K = 4, 6, 8) is run for 100,000 episodes, after pre-training
+each algorithm separately against random bidders. Implementation is
+Gymnasium plus Stable Baselines 3, default hyperparameters, no
+tuning.</p>
+<p>The diagnostic is what they call the <strong>learning ratio</strong>:
+(value minus bid) divided by value — essentially the proportional
+shading of a bid. A learning ratio that settles down means the agent has
+stopped exploring and converged on a strategy; one that keeps moving
+means it has not.</p>
+<h3 id="why-the-literature-cares">2. Why the literature cares</h3>
+<p>Multi-unit auctions are the case where <strong>theory gives the least
+guidance</strong>. Since Vickrey it has been known that single-unit
+intuitions do not carry over; with multi-unit demand there are multiple
+equilibria, demand reduction, and generally no closed-form bidding
+functions. The revenue and efficiency ranking of pay-as-bid versus
+uniform-price is famously unresolved — which is awkward, because that
+exact comparison is what treasury auctions and electricity markets have
+to decide.</p>
+<p>The two existing empirical routes both have limits. Lab experiments
+are constrained by subject numbers and repetition. Structural empirics
+require an equilibrium selection to be assumed. <strong>Simulation with
+learning agents</strong> is the third route: it allows arbitrary numbers
+of bidders and units, and it does not require solving for an
+equilibrium. The existing economics work in this vein (Banchio and
+Skrzypacz 2022; Khezr, Mohan and Page 2024) uses simple Q-learning
+almost exclusively. This paper’s stated purpose is to open the menu.</p>
+<h3 id="why-it-is-a-contribution-and-where-it-fits">3. Why it is a
+contribution, and where it fits</h3>
+<p>The contribution is a <strong>methodological one plus a cautionary
+benchmark</strong>, not a new theorem.</p>
+<p>Methodologically, it is a usable reference for an economist who wants
+to run RL bidders and does not know which algorithm to pick. The
+verdict: <strong>PPO is the clear choice</strong> — it converges
+fastest, holds the most stable learning ratio, and ranks first in payoff
+in almost every configuration. Tabular <strong>Q-learning does
+surprisingly well</strong> despite its simplicity, finishing top-three
+in several settings, which partly vindicates the existing literature’s
+reliance on it. <strong>DQN is the clear loser</strong>, in one
+configuration earning a negative total payoff, which means it is
+systematically overbidding past value.</p>
+<p>Substantively, the cautionary benchmark is the more useful output.
+Because the six algorithms differ in competence, the mixed-population
+runs are effectively an auction among bidders of heterogeneous
+sophistication — and the format ranking there differs from the ranking
+among uniformly skilled bidders. That gap is the paper’s real finding,
+even though it is not the one advertised.</p>
+<p>It fits into the growing algorithmic-bidding literature that Vitali’s
+file already contains (Banchio and Skrzypacz on algorithmic collusion;
+Bichler and coauthors on learning agents in markets), but sits at the
+more applied, simulation-tooling end of it.</p>
+<h3 id="the-key-figure-or-result">4. The key figure or result</h3>
+<p>The two revenue-and-efficiency tables, read together, are the
+paper.</p>
+<p><strong>Mixed population (Table 5).</strong> With K = 4 the three
+formats are close, UP slightly ahead on revenue. As supply rises the
+formats separate sharply: at K = 8, total revenue is <strong>DP
+1,400,719 &gt; GSP 831,480 &gt; UP 642,584</strong> — pay-as-bid raises
+more than twice what uniform-price does. Mean efficiency is nonetheless
+highest under UP throughout (0.87, 0.88, 0.88 across K = 4, 6, 8), with
+DP flat at 0.83–0.84.</p>
+<p><strong>Homogeneous population (Table 6, all six bidders
+PPO).</strong> Efficiency rises for every format and nearly saturates
+(UP 0.98–0.99, GSP 0.97–0.99), and the <strong>revenue ranking
+reverses</strong>: GSP now leads at every supply level (for example
+1,723,650 at K = 8 against DP’s 1,267,547).</p>
+<p>The mechanism is transparent once stated. The apparent revenue
+advantage of pay-as-bid in the mixed run comes from <strong>weak
+learners overbidding</strong> — DQN’s negative payoff is the smoking gun
+— and pay-as-bid is precisely the format that converts an overbid
+directly into seller revenue. Fix the learning, and that revenue
+disappears. GSP emerges as the format whose performance is least
+sensitive to how competent the bidders are.</p>
+<p>A second, smaller observation worth flagging: under <strong>uniform
+price the algorithms learn to overbid on the first unit</strong>,
+contradicting the standard theoretical result that bidding truthfully
+for the first unit is weakly dominant — and they earn higher payoffs
+doing so. The authors suggest this points to stable strategies outside
+the equilibria theory has catalogued.</p>
+<h3 id="why-this-was-hard-and-not-done-before">5. Why this was hard and
+not done before</h3>
+<p>Multi-unit auctions have a <strong>combinatorially large strategy
+space</strong>: each bidder submits a vector of bids, so tabular methods
+run into the curse of dimensionality quickly, which is why the
+literature stayed with single-unit or knapsack settings. Getting six
+independent learners to converge in a <strong>non-stationary
+environment</strong> — each agent’s environment is the other five
+agents, who are themselves still learning — is genuinely unstable, and
+the paper’s honest reporting of which algorithms fail to settle is part
+of its value. There is also plain engineering: custom Gymnasium
+environments had to be built and Stable Baselines 3 modified for
+multi-agent use, and the whole exercise ran on GPU hardware over 54
+training sessions.</p>
+<h3 id="where-this-would-not-do-well">6. Where this would not do
+well</h3>
+<p>The design choices are restrictive in ways that matter for anyone
+wanting to lean on the numbers.</p>
+<ul>
+<li><strong>Each episode is a single step.</strong> The authors flag
+this themselves: PPO and A2C are built for problems where actions have
+multi-period consequences, so a one-shot auction per episode uses none
+of that machinery. Any conclusion about <em>dynamic</em> bidding,
+supply-function competition, or collusion sustained over repeated
+interaction is out of reach here.</li>
+<li><strong>No hyperparameter tuning, by design.</strong> Defaults
+throughout. The algorithm ranking is therefore a ranking of
+out-of-the-box performance, not of potential. The authors concede higher
+compute might reorder it.</li>
+<li><strong>These are not equilibria.</strong> The learning ratios
+converge; nothing establishes that the limit is a Bayes-Nash equilibrium
+or that it is unique. Reporting simulated revenue as a format comparison
+without that caveat would be a mistake — and the
+mixed-versus-homogeneous reversal shows exactly how much it costs.</li>
+<li><strong>Very small and very symmetric.</strong> Six bidders, two
+units of demand each, values iid uniform on the same support. No
+asymmetries, no budget constraints, no reserve prices, no common-value
+component — so nothing here speaks to the winner’s-curse dimension of
+treasury or spectrum auctions.</li>
+<li><strong>The reward function is a modelling choice.</strong>
+Overbidding is penalized more heavily than losing, and rewards are
+normalized by value, which the authors note makes the induced utility
+concave. Risk attitude is therefore imposed, not learned.</li>
+<li><strong>No human validation.</strong> Whether these strategies
+resemble anything a human bidder does is left for future lab work.</li>
+</ul>
+<h3 id="how-to-cite-refer-to-this-paper">7. How to cite / refer to this
+paper</h3>
+<p>Cite it as a <strong>methods survey</strong>, not as evidence on
+auction format performance: Khezr, P. and K. Taylor (2026), “The Use of
+Artificial Intelligence for Auction Design”, <em>Journal of Economic
+Surveys</em> 40(1), 269–285.</p>
+<p>The natural uses are: as the citation for <em>which</em> RL algorithm
+to use when building simulated bidders (PPO, with tabular Q-learning as
+a cheap baseline); as support for the claim that RL simulation is a
+third route alongside theory and experiments in multi-unit settings; and
+— most usefully — as the citation for the warning that <strong>simulated
+revenue rankings depend on the sophistication of the artificial
+bidders</strong>, while efficiency rankings appear more robust. For the
+underlying multi-unit auction theory, cite Krishna (2009) or Ausubel et
+al. (2014) instead. Simulation data is posted by the authors on
+GitHub.</p>
